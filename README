@@ -1,0 +1,182 @@
+MerbMax
+=======
+MerbMax is a collection of little nifty plugins for merb
+
+
+Why is this one gem?
+===================
+Everyone else is breaking big projects up into a bunch of different gems for ease of swapping things out, so
+why am I putting this in one gem?  
+
+_It's easier for me to maintain this way_
+
+Plus, everything in this projects is 'opt-in' so it's no big deal. If the few extra files worry you that you aren't using, you_are_nuts.
+
+
+Plugin Descriptions
+===================
+  * Coerce
+    * Helpers
+  * Roles
+    * Helpers
+  * Meta
+
+
+STILL ADDING THESE ( They are coming soon, I sweat it)
+==================
+  * Threshold - Track access to controller/action in the seamlessly session, and limit access
+    * Wait - Force a user to 'wait' out threshold exceptions
+    * Recaptcha - Force a user to solve a captcha to continue use beyond threshold
+  * SessionExclusions - Session keys that will be stored as unmarshaled columns for your querying pleasure
+  * SessionNoMarshalMemcached - a MemCache session store that doesn't marshal at all, great for tiny sessions
+  * RepositoryPerResource - Set a DM Repository at the Controller level
+  * EnhancedEnvironments (No static references)
+    * .development?
+    * .production? should test /production/i (in case of productionWww, etc)
+    * merge_env, better name? & keep track of what was merged into an environment
+    * acts_like?(:development) -> Is this that environment, or was that environment merged in?
+  * Pagination
+  * VokleAPI Pattern (ad nauseam)
+  
+
+Usage
+=====
+
+Coerce
+------
+Coerces values in the params hash before the controller dispatches the action. There are some helpers in coerce/helpers.
+
+    require 'merb_max'
+    require 'merb_max/coerce'
+    require 'merb_max/coerce/helpers'    
+    
+    class People < Merb::Controller # People Controller
+      coerce(:id){|_id_| _id_.to_i } # Will convert that String representation of your ID to a integer
+      
+      # There are a few baked into coerce/helpers
+      coerce_to_i(:id) # as above
+      
+      # Got stupid 'on' and 'true' values from HTML and Flash checkboxes?
+      coerce_str_to_bool(:my_boolean_option)
+      
+      # They also take values to pass to their underlying before filter
+      coerce(:name, :only => [:show]){|_name| "Hey, welcome to the 'show' action, #{_name}"}
+    end
+
+
+Roles
+-----
+Allow merb instances to assume roles, i.e. :www, :api and optimize the provides/filters for that role.  There are a few helpers available in roles/helpers
+
+Role values don't "mean anything." You can call a role :www, or :api, or :duck_crackers or :whatever floats your :boat.
+
+Where the magic comes in is in your Controllers, because you can optionally call "before filters" and interact with Merb's Provides API.
+
+The point of the 'roles' plugin is to allow you to put all your Web and API code in once project (the models are the same, access is controlled the same way), but
+you don't necessarily want your WWW servers doing things the way your API servers are doing them, right?
+
+Again, anything you can do at the Controller level in a controller, you can do in one of 'role_config' blocks and it'll only be handled
+by a server that was booted in that environment role.
+
+    require 'merb_max'
+    require 'merb_max/roles'
+    require 'merb_max/roles/helpers'
+
+    # in development.rb, production.rb, environment.rb, etc
+    # I create alternate environments called productionWww productionApi and set this accordingly.
+    #
+    Merb::Config[:role] = :api # This server should assume the 'api' role
+
+    # in the People Controller
+    class People < Merb::Controller
+      role_config(:api){ 
+        no_ui #no_ui is a helper that removes the :edit and :new actions
+        
+        # These could be YOUR before filters, whatevs.
+        before :my_super_secure_verify_api_method
+        before :track_api_usage     
+        
+        only_provides :js # XML is so early turn of the century ;)
+      } 
+      
+      role_config(:www){
+        meta(:keywords => "This site is full of stunning people") #this is available in the merb_max/meta plugin. CROSS PROMOTION SON!
+        
+        before :verify_user_is_logged_in
+      }
+      
+      
+    end
+    
+    class AdminPanel < Merb::Controller
+      role_config(:api){ unsupported } # A server instance booted as an
+    end
+
+
+Meta
+----
+Easy access to keywords, title, and description meta tags from inside an action.
+
+A plugin for merb that allows super easy manipulation of Meta tags on a controller by controller,
+page-by-page basis
+
+    ### ... from app/controllers/application.rb
+
+    class Application < Merb::Controller
+    meta  :title     => "My default page title",
+      :description  => "My default page description",
+      :keywords     => "cool, default keywords, web 2.0"
+    end
+
+    ### ... from app/views/layout/application.html.erb
+    #       meta tags can be output via 'meta' or 'meta :tagname'
+
+    #       using 'meta' will output all the meta data in html tags like
+    <html>
+      <head>
+      <%= meta %>
+        <!-- Would render;
+          <title>My default page title</title>
+          <meta name="keywords" content="cool, default keywords, web 2.0" />
+          <meta name="description" content="My default page description" />
+        -->
+      </head>
+    ...
+    </html>
+
+    #       optionally you can get the value of a particular tag like so:
+    <html>
+      <head>
+        <title><%= meta :title %></title>
+        <meta name="keywords" content="<%= meta :keywords %>" />
+        <meta name="description" content="<%= meta :description %>" />
+      </head>
+      <body>
+        ...
+      </body>
+    </html>
+
+    ### ... the tags can be overriden on a per controller or per action basis.
+    class ControllerA < Merb::Controller
+      meta :title => "This is controller a"
+
+      def action_a
+        meta :title => "this is action a", :keywords => "action a, action"
+        render
+        # :title => "this is action a"
+        # :keywords => "action a, action"
+        # :description => "My default controller description"
+      end
+  
+      def action_b
+        render
+        # :title => "This is controller a"
+        # :description => "My default page description"
+        # :keywords => "cool, default keywords, web 2.0"
+      end
+    end
+
+
+Don't Forget
+============
+You can combine this plugins to do cool things.  Like only threshold your API servers, and only add Meta Tags to your HTML responses.
