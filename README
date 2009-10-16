@@ -100,7 +100,8 @@ by a server that was booted in that environment role.
       } 
       
       role_config(:www){
-        meta(:keywords => "This site is full of stunning people") #this is available in the merb_max/meta plugin. CROSS PROMOTION SON!
+        #this is available in the merb_max/meta plugin. CROSS PROMOTION SON!
+        meta(:keywords => "This site is full of stunning people") 
         
         before :verify_user_is_logged_in
       }
@@ -109,7 +110,8 @@ by a server that was booted in that environment role.
     end
     
     class AdminPanel < Merb::Controller
-      role_config(:api){ unsupported } # A server instance booted as an
+      # Dont respond to requests to /adminpanel for API requests (unsupported is in helpers)
+      role_config(:api){ unsupported } 
     end
 
 
