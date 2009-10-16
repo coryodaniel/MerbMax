@@ -13,7 +13,7 @@ _It's easier for me to maintain this way_
 Plus, everything in this projects is 'opt-in' so it's no big deal. If the few extra files worry you that you aren't using, you_are_nuts.
 
 
-Plugin Descriptions
+Current Plugins
 ===================
   * Coerce
     * Helpers
@@ -22,7 +22,7 @@ Plugin Descriptions
   * Meta
 
 
-STILL ADDING THESE ( They are coming soon, I sweat it)
+Plugins I'm gutting out of hacks in our local merb branch over the next few days
 ==================
   * Threshold - Track access to controller/action in the seamlessly session, and limit access
     * Wait - Force a user to 'wait' out threshold exceptions
