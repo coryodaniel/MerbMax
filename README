@@ -115,10 +115,8 @@ by a server that was booted in that environment role.
 
 Meta
 ----
-Easy access to keywords, title, and description meta tags from inside an action.
-
-A plugin for merb that allows super easy manipulation of Meta tags on a controller by controller,
-page-by-page basis
+Easy access to keywords, title, and description meta tags from inside an action, so you can get your SEO (search engine optimization) on on a request by request basis.
+Provides meta controller (inheritably) on a controller-by-controller and action-by-action basis
 
     ### ... from app/controllers/application.rb
 
