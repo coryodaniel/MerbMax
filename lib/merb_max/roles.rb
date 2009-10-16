@@ -7,7 +7,7 @@ module Merb
 end
 
 module Merb  
-  module ControllerMixin #changed from ResponderMixin
+  module ResponderMixin #changed from ResponderMixin
     
     # Instance level:
     #   Conditionally runs a block if the server is in the given roles
