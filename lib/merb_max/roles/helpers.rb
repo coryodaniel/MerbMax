@@ -2,14 +2,14 @@
 #
 module Merb  
   module ResponderMixin
+    # raise NotFound as if action wasn't supported
+    #
+    def _remove_action_
+      raise ::Merb::ControllerExceptions::NotFound
+    end
+
     module ClassMethods
-      
-      # raise NotFound as if action wasn't supported
-      #
-      def _remove_action_
-        raise NotFound
-      end
-      
+            
       # Removes :edit and :new action
       def no_ui
         before :_remove_action_, :only => [:new, :edit]
