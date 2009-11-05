@@ -1,1 +1,2 @@
-# Im sure there is a sneakier less verbose method of doing this, I was in a rush :)
+# Rewrite meta utilizing throw_content(:for_head)
+# Allow meta to send <link>

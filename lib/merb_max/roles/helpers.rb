@@ -1,7 +1,7 @@
 # A set of named before filters used to clean up those controllers and make them a little more DRY
 #
 module Merb  
-  module ControllerMixin
+  module ResponderMixin
     module ClassMethods
       
       # raise NotFound as if action wasn't supported
